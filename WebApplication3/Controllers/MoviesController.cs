@@ -31,19 +31,18 @@ namespace WebApplication3.Controllers
         {
             IQueryable<Movie> result = context.Movies.Include(c => c.Comments);
             if (from == null && to == null)
-            
-                return result;
-            
+            {
+                return result.OrderByDescending(m => m.DateAdded);
+            }
             if (from != null)
-            
+            {
                 result = result.Where(e => e.DateAdded >= from);
-               
-            
+            }
             if (to != null)
-            
+            {
                 result = result.Where(e => e.DateAdded <= to);
-            
-            return result;
+            }
+            return result.OrderByDescending(m => m.DateAdded);
         }
 
 
