@@ -29,10 +29,11 @@ namespace WebApplication3.Controllers
         // ? permite unui struct sa ia si valoare null
         public IEnumerable<Movie> Get([FromQuery]DateTime? from, [FromQuery]DateTime? to)
         {
-            IQueryable<Movie> result = context.Movies.Include(c => c.Comments);
+            IQueryable<Movie> result = context.Movies.Include(c => c.Comments).OrderByDescending(m =>m.ReleaseYear)
+    ;
             if (from == null && to == null)
             {
-                return result.OrderByDescending(m => m.DateAdded);
+                return result;
             }
             if (from != null)
             {
@@ -42,7 +43,7 @@ namespace WebApplication3.Controllers
             {
                 result = result.Where(e => e.DateAdded <= to);
             }
-            return result.OrderByDescending(m => m.DateAdded);
+            return result;
         }
 
 
@@ -92,7 +93,7 @@ namespace WebApplication3.Controllers
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {
-            var existing = context.Movies.FirstOrDefault(movie => movie.Id == id);
+            var existing = context.Movies.Include(c => c.Comments).FirstOrDefault(movie => movie.Id == id);
             if (existing == null)
             {
                 return NotFound();
