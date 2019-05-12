@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -16,12 +17,35 @@ namespace WebApplication3.Controllers
             this.context = context;
         }
 
+        //// GET: api/Movies
+        //[HttpGet]
+        //public IEnumerable<Movie> Get()
+        //{
+        //    return context.Movies;
+        //}
+
         // GET: api/Movies
         [HttpGet]
-        public IEnumerable<Movie> Get()
+        // ? permite unui struct sa ia si valoare null
+        public IEnumerable<Movie> Get([FromQuery]DateTime? from, [FromQuery]DateTime? to)
         {
-            return context.Movies;
+            IQueryable<Movie> result = context.Movies.Include(c => c.Comments);
+            if (from == null && to == null)
+            
+                return result;
+            
+            if (from != null)
+            
+                result = result.Where(e => e.DateAdded >= from);
+               
+            
+            if (to != null)
+            
+                result = result.Where(e => e.DateAdded <= to);
+            
+            return result;
         }
+
 
         // GET: api/Movies/5
         [HttpGet("{id}", Name = "Get")]

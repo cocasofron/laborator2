@@ -4,6 +4,14 @@ using System.ComponentModel.DataAnnotations;
 
 namespace WebApplication3.Models
 {
+
+    public enum Genre
+    {
+        Action,
+        Comedy,
+        Horror,
+        Thriller
+    }
     public class Movie
     {
         public int Id { get; set; }
