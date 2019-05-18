@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WebApplication3.Models;
+using WebApplication3.Services;
+using WebApplication3.ViewModels;
 
 namespace WebApplication3.Controllers
 {
@@ -11,39 +14,22 @@ namespace WebApplication3.Controllers
     [ApiController]
     public class MoviesController : ControllerBase
     {
-        private MoviesDbContext context;
-        public MoviesController(MoviesDbContext context)
+        private IMovieService movieService;
+        public MoviesController(IMovieService movieService)
         {
-            this.context = context;
+            this.movieService = movieService;
         }
-
-        //// GET: api/Movies
-        //[HttpGet]
-        //public IEnumerable<Movie> Get()
-        //{
-        //    return context.Movies;
-        //}
-
-        // GET: api/Movies
+        /// <summary>
+        /// Get all the movies
+        /// </summary>
+        /// <param name="from">date</param>
+        /// <param name="to">date</param>
+        /// <returns>list of movies</returns>
         [HttpGet]
         // ? permite unui struct sa ia si valoare null
-        public IEnumerable<Movie> Get([FromQuery]DateTime? from, [FromQuery]DateTime? to)
+        public IEnumerable<MovieGetModel> Get([FromQuery]DateTime? from, [FromQuery]DateTime? to)
         {
-            IQueryable<Movie> result = context.Movies.Include(c => c.Comments).OrderByDescending(m =>m.ReleaseYear)
-    ;
-            if (from == null && to == null)
-            {
-                return result;
-            }
-            if (from != null)
-            {
-                result = result.Where(e => e.DateAdded >= from);
-            }
-            if (to != null)
-            {
-                result = result.Where(e => e.DateAdded <= to);
-            }
-            return result;
+            return movieService.GetAll();
         }
 
 
@@ -51,56 +37,65 @@ namespace WebApplication3.Controllers
         [HttpGet("{id}", Name = "Get")]
         public IActionResult Get(int id)
         {
-            var existing = context.Movies.FirstOrDefault(movie => movie.Id == id);
-            if (existing == null)
+            var found = movieService.GetById(id);
+            if (found == null)
             {
                 return NotFound();
             }
-
-            return Ok(existing);
+            return Ok(found);
         }
 
-        // POST: api/Movies
+        /// <summary>
+        /// 
+        /// <remarks>
+        /// Sample request:
+        ///
+        ///     POST /movies
+        ///  {
+        ///   "title": "Test",
+        ///   "description": "Description of the movie",
+        ///  "duration": 120,
+        ///  "genre": 0,
+        ///  "releaseYear": 2018,
+        ///  "dateAdded": "2019-05-10T09:10:00",
+        ///  "director": "Corina",
+        ///  "rating": 8,
+        ///  "watched": true,
+        ///  "comments": [
+        /// 	{"text":"comment",
+        /// 	"important":true,
+        ///    }
+        ///	  ]
+        ///  }
+        ///</remarks>
+        /// </summary>
+        /// <param name="movie"></param>
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [HttpPost]
-        public void Post([FromBody] Movie movie)
+        public void Post([FromBody] MoviePostModel movie)
         {
-            //if (!ModelState.IsValid)
-            //{
-
-            //}
-            context.Movies.Add(movie);
-            context.SaveChanges();
+            movieService.Create(movie);
         }
 
         // PUT: api/Movies/5
         [HttpPut("{id}")]
         public IActionResult Put(int id, [FromBody] Movie movie)
         {
-            var existing = context.Movies.AsNoTracking().FirstOrDefault(f => f.Id == id);
-            if (existing == null)
-            {
-                context.Movies.Add(movie);
-                context.SaveChanges();
-                return Ok(movie);
-            }
-            movie.Id = id;
-            context.Movies.Update(movie);
-            context.SaveChanges();
-            return Ok(movie);
+            var result = movieService.Upsert(id, movie);
+            return Ok(result);
         }
 
         // DELETE: api/ApiWithActions/5
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {
-            var existing = context.Movies.Include(c => c.Comments).FirstOrDefault(movie => movie.Id == id);
-            if (existing == null)
+            var result = movieService.Delete(id);
+            if (result == null)
             {
                 return NotFound();
             }
-            context.Movies.Remove(existing);
-            context.SaveChanges();
-            return Ok();
+            return Ok(result);
         }
     }
 }
