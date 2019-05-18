@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using WebApplication3.Models;
 
 namespace WebApplication3.ViewModels
@@ -12,6 +9,8 @@ namespace WebApplication3.ViewModels
         public string Title { get; set; }
         public int Duration { get; set; }
         public int Rating { get; set; }
+        public DateTime DateAdded { get; set; }
+        public int ReleaseYear { get; set; }
         public int NumberOfComments { get; set; }
 
         public static MovieGetModel FromMovie(Movie movie)
@@ -21,6 +20,8 @@ namespace WebApplication3.ViewModels
                 Title = movie.Title,
                 Duration = movie.Duration,
                 Rating = movie.Rating,
+                DateAdded=movie.DateAdded,
+                ReleaseYear=movie.ReleaseYear,
                 NumberOfComments = movie.Comments.Count
             };
         }
