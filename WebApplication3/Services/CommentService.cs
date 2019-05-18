@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
 using System.Linq;
 using WebApplication3.Models;
 using WebApplication3.ViewModels;
@@ -19,23 +20,45 @@ namespace WebApplication3.Services
 
         public IEnumerable<CommentGetModel> GetAll(string filter)
         {
+
+            IQueryable<Movie> result = context.Movies.Include(c => c.Comments);
+
+            List<CommentGetModel> resultComments = new List<CommentGetModel>();
+            List<CommentGetModel> resultCommentsNoFilter = new List<CommentGetModel>();
+
+            foreach (Movie m in result)
+            {
+                m.Comments.ForEach(c =>
+                {
+                    if (c.Text == null || filter == null)
+                    {
+                        CommentGetModel comment = new CommentGetModel
+                        {
+                            Important = c.Important,
+                            Text = c.Text,
+                            MovieId = m.Id
+
+                        };
+                        resultCommentsNoFilter.Add(comment);
+                    }
+                    else if (c.Text.Contains(filter))
+                    {
+                        CommentGetModel comment = new CommentGetModel
+                        {
+                            Important = c.Important,
+                            Text = c.Text,
+                            MovieId = m.Id
+
+                        };
+                        resultComments.Add(comment);
+                    }
+                });
+            }
             if (filter == null)
             {
-                IQueryable<CommentGetModel> allComments = context.Comments.Select(c => new CommentGetModel
-                {
-                    Text = c.Text,
-                    Important = c.Important,
-                    MovieId = c.Id
-                });
-                return allComments;
+                return resultCommentsNoFilter;
             }
-            IQueryable<CommentGetModel> comments = context.Comments.Where(c => c.Text.Contains(filter))
-                .Select(c => new CommentGetModel {
-                    Text=c.Text,
-                    Important=c.Important,
-                    MovieId=c.Id
-                });
-            return comments;
+            return resultComments;
         }
     }
 }
