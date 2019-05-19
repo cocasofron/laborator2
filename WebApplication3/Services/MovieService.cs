@@ -39,7 +39,8 @@ namespace WebApplication3.Services
 
         public Movie Delete(int id)
         {
-            var existing = context.Movies.FirstOrDefault(flower => flower.Id == id);
+            var existing = context.Movies.Include(c=>c.
+            Comments).FirstOrDefault(flower => flower.Id == id);
             if (existing == null)
             {
                 return null;

@@ -23,6 +23,8 @@ namespace WebApplication3.Controllers
         /// <param name="from">date</param>
         /// <param name="to">date</param>
         /// <returns>list of movies</returns>
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [HttpGet]
         // ? permite unui struct sa ia si valoare null
         public IEnumerable<MovieGetModel> Get([FromQuery]DateTime? from, [FromQuery]DateTime? to)
@@ -86,6 +88,8 @@ namespace WebApplication3.Controllers
         /// <param name="movie"></param>
         /// <returns></returns>
         // PUT: api/Movies/5
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [HttpPut("{id}")]
         public IActionResult Put(int id, [FromBody] Movie movie)
         {
@@ -98,6 +102,8 @@ namespace WebApplication3.Controllers
         /// <param name="id">the id of the movie to be deleted</param>
         /// <returns></returns>
         // DELETE: api/ApiWithActions/5
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {
