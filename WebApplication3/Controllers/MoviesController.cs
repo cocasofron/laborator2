@@ -75,7 +75,7 @@ namespace WebApplication3.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [HttpPost]
-        public void Post([FromBody] MoviePostModel movie)
+        public void Post([FromBody] Movie movie)
         {
             movieService.Create(movie);
         }

@@ -17,7 +17,7 @@ namespace WebApplication3.Services
         /// <returns></returns>
         IEnumerable<MovieGetModel> GetAll(DateTime? from = null, DateTime? to = null);
         Movie GetById(int id);
-        Movie Create(MoviePostModel movie);
+        Movie Create(Movie movie);
         Movie Upsert(int id, Movie movie);
         Movie Delete(int id);
     }
@@ -29,12 +29,12 @@ namespace WebApplication3.Services
             this.context = context;
         }
 
-        public Movie Create(MoviePostModel movie)
+        public Movie Create(Movie movie)
         {
-            Movie toAdd = MoviePostModel.ToMovie(movie);
-            context.Movies.Add(toAdd);
+            
+            context.Movies.Add(movie);
             context.SaveChanges();
-            return toAdd;
+            return movie;
         }
 
         public Movie Delete(int id)
